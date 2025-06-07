@@ -251,7 +251,7 @@
 <body>
 <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px;">
     <a href="index.html" style="padding: 10px 20px; background-color: #3498db; color: white; text-decoration: none; border-radius: 5px;">Home</a>
-    <h1 style="margin: 0;">Sneaky Words</h1>
+    <h1 style="margin: 0;">Snakey Words</h1>
   </div>
 
   <div class="instructions">
@@ -782,7 +782,8 @@
         svgOverlay.style.height = '100%';
         svgOverlay.style.top = '0';
         svgOverlay.style.left = '0';
-        svgOverlay.style.zIndex = '-1';
+        svgOverlay.style.zIndex = '1';
+        svgOverlay.setAttribute('pointer-events', 'none');
         gridElement.appendChild(svgOverlay);
 
         // SVG overlay will be used to draw lines when words are found
@@ -801,14 +802,6 @@
             if (grid[row][col] !== null) {
               const cellData = grid[row][col];
               cell.textContent = cellData.letter.toUpperCase();
-
-              // Add mouse events for selection
-              cell.addEventListener('mousedown', startSelection);
-              cell.addEventListener('mouseover', continueSelection);
-              cell.addEventListener('mouseup', endSelection);
-              cell.addEventListener('touchstart', handleTouchStart);
-              cell.addEventListener('touchmove', handleTouchMove);
-              cell.addEventListener('touchend', handleTouchEnd);
             } else {
               cell.className += ' blank';
             }
@@ -817,9 +810,44 @@
           }
         }
 
-        // Add mouse events to document
-        document.addEventListener('mouseup', endSelection);
-        document.addEventListener('touchend', handleTouchEnd);
+        // Add event delegation to grid container
+        setupGridEventListeners();
+      }
+
+      function setupGridEventListeners() {
+        // Use event delegation for better performance and reliability
+        gridElement.addEventListener('mousedown', function(e) {
+          if (e.target.classList.contains('cell') && !e.target.classList.contains('blank')) {
+            startSelection(e);
+          }
+        });
+
+        gridElement.addEventListener('mouseover', function(e) {
+          if (e.target.classList.contains('cell') && !e.target.classList.contains('blank')) {
+            continueSelection(e);
+          }
+        });
+
+        gridElement.addEventListener('mouseup', function(e) {
+          if (e.target.classList.contains('cell')) {
+            endSelection(e);
+          }
+        });
+
+        // Touch events with proper delegation
+        gridElement.addEventListener('touchstart', function(e) {
+          if (e.target.classList.contains('cell') && !e.target.classList.contains('blank')) {
+            handleTouchStart(e);
+          }
+        }, { passive: false });
+
+        gridElement.addEventListener('touchmove', function(e) {
+          handleTouchMove(e);
+        }, { passive: false });
+
+        gridElement.addEventListener('touchend', function(e) {
+          handleTouchEnd(e);
+        }, { passive: false });
       }
 
       function updateWordList(words) {
@@ -897,24 +925,31 @@
       }
 
       function handleTouchStart(e) {
-        const touch = e.touches[0];
-        const element = document.elementFromPoint(touch.clientX, touch.clientY);
-
-        if (element && element.classList.contains('cell')) {
-          isMouseDown = true;
-
-          // Add this cell to selection
-          selectedCells = [{ 
-            row: parseInt(element.dataset.row), 
-            col: parseInt(element.dataset.col),
-            element: element
-          }];
-
-          element.classList.add('selected');
+        // Only handle if the touch started on a cell and has content
+        if (!e.target.classList.contains('cell') || e.target.classList.contains('blank')) return;
+        
+        const element = e.target;
+        
+        // Don't start selection if cell is part of a found word
+        if (element.classList.contains('highlighted')) {
+          clearSelection();
+          return;
         }
+        
+        isMouseDown = true;
 
-        // Prevent scrolling
+        // Add this cell to selection
+        selectedCells = [{ 
+          row: parseInt(element.dataset.row), 
+          col: parseInt(element.dataset.col),
+          element: element
+        }];
+
+        element.classList.add('selected');
+        
+        // Only prevent default for actual cell interactions
         e.preventDefault();
+        e.stopPropagation();
       }
 
       function handleTouchMove(e) {
@@ -945,13 +980,17 @@
           }
         }
 
-        // Prevent scrolling
+        // Only prevent default when actively selecting
         e.preventDefault();
       }
 
       function handleTouchEnd(e) {
-        endSelection();
-        e.preventDefault();
+        if (isMouseDown) {
+          endSelection();
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        isMouseDown = false;
       }
 
       // Array of colors for highlighting found words
