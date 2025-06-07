@@ -216,7 +216,7 @@
 <body>
   <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 20px;">
     <a href="index.html" style="padding: 10px 20px; background-color: #3498db; color: white; text-decoration: none; border-radius: 5px;">Home</a>
-    <h1 style="margin: 0;">Sneaky Words</h1>
+    <h1 style="margin: 0;">Snakey Words</h1>
   </div>
 
   <div class="instructions">
@@ -755,9 +755,20 @@
           }
         }
 
-        // Add mouse events to document
-        document.addEventListener('mouseup', endSelection);
-        document.addEventListener('touchend', handleTouchEnd);
+        // Add global event listeners only for ending selection
+        document.addEventListener('mouseup', function(e) {
+          if (isMouseDown) {
+            endSelection();
+          }
+        });
+        
+        // Handle touch end globally but more carefully
+        document.addEventListener('touchend', function(e) {
+          if (isMouseDown) {
+            endSelection();
+            isMouseDown = false;
+          }
+        }, { passive: false });
       }
 
       function updateWordList(words) {
@@ -835,23 +846,22 @@
       }
 
       function handleTouchStart(e) {
-        const touch = e.touches[0];
-        const element = document.elementFromPoint(touch.clientX, touch.clientY);
+        // Only handle if the touch started on a cell
+        if (!e.target.classList.contains('cell')) return;
+        
+        const element = e.target;
+        isMouseDown = true;
 
-        if (element && element.classList.contains('cell')) {
-          isMouseDown = true;
+        // Add this cell to selection
+        selectedCells = [{ 
+          row: parseInt(element.dataset.row), 
+          col: parseInt(element.dataset.col),
+          element: element
+        }];
 
-          // Add this cell to selection
-          selectedCells = [{ 
-            row: parseInt(element.dataset.row), 
-            col: parseInt(element.dataset.col),
-            element: element
-          }];
-
-          element.classList.add('selected');
-        }
-
-        // Prevent scrolling
+        element.classList.add('selected');
+        
+        // Only prevent default for cell interactions
         e.preventDefault();
       }
 
@@ -883,13 +893,17 @@
           }
         }
 
-        // Prevent scrolling
+        // Only prevent default when actively selecting
         e.preventDefault();
       }
 
       function handleTouchEnd(e) {
-        endSelection();
-        e.preventDefault();
+        if (isMouseDown) {
+          endSelection();
+          // Only prevent default if we were actually selecting
+          e.preventDefault();
+        }
+        isMouseDown = false;
       }
 
       // Array of colors for highlighting found words
