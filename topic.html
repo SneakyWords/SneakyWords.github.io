@@ -201,6 +201,16 @@
     .word-list.hidden {
       display: none;
     }
+
+    /* Show word bank automatically on mobile */
+    @media screen and (max-width: 767px) {
+      .word-list {
+        display: flex !important;
+      }
+      .toggle-wordbank-btn {
+        display: none;
+      }
+    }
     .invis{
       display: none;
     }
