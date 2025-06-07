@@ -720,7 +720,8 @@
         svgOverlay.style.height = '100%';
         svgOverlay.style.top = '0';
         svgOverlay.style.left = '0';
-        svgOverlay.style.zIndex = '-1';
+        svgOverlay.style.zIndex = '1';
+        svgOverlay.setAttribute('pointer-events', 'none');
         gridElement.appendChild(svgOverlay);
 
         // SVG overlay will be used to draw lines when words are found
@@ -739,14 +740,6 @@
             if (grid[row][col] !== null) {
               const cellData = grid[row][col];
               cell.textContent = cellData.letter.toUpperCase();
-
-              // Add mouse events for selection
-              cell.addEventListener('mousedown', startSelection);
-              cell.addEventListener('mouseover', continueSelection);
-              cell.addEventListener('mouseup', endSelection);
-              cell.addEventListener('touchstart', handleTouchStart);
-              cell.addEventListener('touchmove', handleTouchMove);
-              cell.addEventListener('touchend', handleTouchEnd);
             } else {
               cell.className += ' blank';
             }
@@ -755,19 +748,46 @@
           }
         }
 
-        // Add global event listeners only for ending selection
-        document.addEventListener('mouseup', function(e) {
-          if (isMouseDown) {
-            endSelection();
+        // Add event delegation to grid container
+        setupGridEventListeners();
+      }
+
+      function setupGridEventListeners() {
+        // Remove any existing listeners to prevent duplicates
+        const existingGrid = gridElement;
+        
+        // Use event delegation for better performance and reliability
+        existingGrid.addEventListener('mousedown', function(e) {
+          if (e.target.classList.contains('cell') && !e.target.classList.contains('blank')) {
+            startSelection(e);
           }
         });
-        
-        // Handle touch end globally but more carefully
-        document.addEventListener('touchend', function(e) {
-          if (isMouseDown) {
-            endSelection();
-            isMouseDown = false;
+
+        existingGrid.addEventListener('mouseover', function(e) {
+          if (e.target.classList.contains('cell') && !e.target.classList.contains('blank')) {
+            continueSelection(e);
           }
+        });
+
+        existingGrid.addEventListener('mouseup', function(e) {
+          if (e.target.classList.contains('cell')) {
+            endSelection(e);
+          }
+        });
+
+        // Touch events with proper delegation
+        existingGrid.addEventListener('touchstart', function(e) {
+          if (e.target.classList.contains('cell') && !e.target.classList.contains('blank')) {
+            handleTouchStart(e);
+          }
+        }, { passive: false });
+
+        existingGrid.addEventListener('touchmove', function(e) {
+          handleTouchMove(e);
+        }, { passive: false });
+
+        existingGrid.addEventListener('touchend', function(e) {
+          handleTouchEnd(e);
         }, { passive: false });
       }
 
@@ -846,10 +866,17 @@
       }
 
       function handleTouchStart(e) {
-        // Only handle if the touch started on a cell
-        if (!e.target.classList.contains('cell')) return;
+        // Only handle if the touch started on a cell and has content
+        if (!e.target.classList.contains('cell') || e.target.classList.contains('blank')) return;
         
         const element = e.target;
+        
+        // Don't start selection if cell is part of a found word
+        if (element.classList.contains('highlighted')) {
+          clearSelection();
+          return;
+        }
+        
         isMouseDown = true;
 
         // Add this cell to selection
@@ -861,8 +888,9 @@
 
         element.classList.add('selected');
         
-        // Only prevent default for cell interactions
+        // Only prevent default for actual cell interactions
         e.preventDefault();
+        e.stopPropagation();
       }
 
       function handleTouchMove(e) {
@@ -871,7 +899,7 @@
         const touch = e.touches[0];
         const element = document.elementFromPoint(touch.clientX, touch.clientY);
 
-        if (element && element.classList.contains('cell')) {
+        if (element && element.classList.contains('cell') && !element.classList.contains('blank')) {
           const row = parseInt(element.dataset.row);
           const col = parseInt(element.dataset.col);
 
@@ -893,15 +921,18 @@
           }
         }
 
-        // Only prevent default when actively selecting
-        e.preventDefault();
+        // Only prevent default when actively selecting on cells
+        if (isMouseDown) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
       }
 
       function handleTouchEnd(e) {
         if (isMouseDown) {
           endSelection();
-          // Only prevent default if we were actually selecting
           e.preventDefault();
+          e.stopPropagation();
         }
         isMouseDown = false;
       }
