@@ -118,11 +118,34 @@
       font-weight: bold;
       color: #e74c3c;
     }
+    .instructions-container {
+      margin-bottom: 20px;
+    }
+    .instructions-toggle {
+      background-color: white;
+      color: black;
+      border: none;
+      border-bottom: 2px solid black;
+      border-radius: 0;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      text-align: left;
+      margin-bottom: 10px;
+      padding: 10px 15px;
+    }
+    .instructions-toggle:hover {
+      background-color: #f8f9fa;
+    }
     .instructions {
       background-color: #f8f9fa;
       padding: 15px;
       border-radius: 5px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
+      display: none;
+    }
+    .instructions.show {
+      display: block;
     }
     .word-list {
       display: flex;
@@ -202,28 +225,17 @@
       display: none;
     }
 
-    /* Show word bank automatically on mobile */
+    /* Default mobile behavior - show word bank unless explicitly hidden */
     @media screen and (max-width: 767px) {
-      .word-list {
-        display: flex !important;
-      }
-      .toggle-wordbank-btn {
-        display: none;
+      .word-list:not(.hidden) {
+        display: flex;
       }
     }
     .invis{
       display: none;
     }
 
-    /* Hide game control buttons on mobile */
-    @media screen and (max-width: 767px) {
-      .game-controls {
-        display: none;
-      }
-      .reset-button {
-        display: none;
-      }
-    }
+
 
     /* Styles for the topic dropdown */
     .topic-dropdown {
@@ -264,22 +276,27 @@
     <h1 style="margin: 0;">Snakey Words</h1>
   </div>
 
-  <div class="instructions">
-    <ol>
-      <li>Select the topic you'd like to practice <br>The game will place the words into the grid without overlapping letters.</li>
-      <li>Your task is to find the words hidden in the grid.</li>
-      <ul>
-        <li>Letters can be connected in any direction: vertically, horizontally, or diagonally.</li>
-        <li>Each letter can only be used once per word.</li>
-        <li>Words can cross each other, but cannot share the same letter.</li>
-      </ul>
-      <li>To submit a word, slide your finger or mouse through its letters in the correct sequence.</li>
-      <li>Important!</li>
-      <ul>
-        <li>Some words may have multiple paths—but only one combination allows the entire grid to be filled correctly. Your goal is to find that one valid solution.</li>
-        <li>Sometimes, the word category contains more words than fit in the grid - in this case, only some words from the list will be selected randomly (e.g., you will never see all the months in the year, but will have a chance to practice a different set each time you launch the game)</li>
-      </ul>
-    </ol>
+  <div class="instructions-container">
+    <button class="instructions-toggle" onclick="toggleInstructions()">
+      <span id="instructions-arrow">▼</span> Instructions (click to view)
+    </button>
+    <div class="instructions" id="instructions-content">
+      <ol>
+        <li>Select the topic you'd like to practice <br>The game will place the words into the grid without overlapping letters.</li>
+        <li>Your task is to find the words hidden in the grid.</li>
+        <ul>
+          <li>Letters can be connected in any direction: vertically, horizontally, or diagonally.</li>
+          <li>Each letter can only be used once per word.</li>
+          <li>Words can cross each other, but cannot share the same letter.</li>
+        </ul>
+        <li>To submit a word, slide your finger or mouse through its letters in the correct sequence.</li>
+        <li>Important!</li>
+        <ul>
+          <li>Some words may have multiple paths—but only one combination allows the entire grid to be filled correctly. Your goal is to find that one valid solution.</li>
+          <li>Sometimes, the word category contains more words than fit in the grid - in this case, only some words from the list will be selected randomly (e.g., you will never see all the months in the year, but will have a chance to practice a different set each time you launch the game)</li>
+        </ul>
+      </ol>
+    </div>
   </div>
 
   <div class="input-section">
@@ -937,15 +954,15 @@
       function handleTouchStart(e) {
         // Only handle if the touch started on a cell and has content
         if (!e.target.classList.contains('cell') || e.target.classList.contains('blank')) return;
-        
+
         const element = e.target;
-        
+
         // Don't start selection if cell is part of a found word
         if (element.classList.contains('highlighted')) {
           clearSelection();
           return;
         }
-        
+
         isMouseDown = true;
 
         // Add this cell to selection
@@ -956,7 +973,7 @@
         }];
 
         element.classList.add('selected');
-        
+
         // Only prevent default for actual cell interactions
         e.preventDefault();
         e.stopPropagation();
@@ -1253,7 +1270,19 @@
         }
       }, true); // Use capture phase
     });
+
+    function toggleInstructions() {
+      const instructions = document.getElementById('instructions-content');
+      const arrow = document.getElementById('instructions-arrow');
+
+      if (instructions.classList.contains('show')) {
+        instructions.classList.remove('show');
+        arrow.textContent = '▼';
+      } else {
+        instructions.classList.add('show');
+        arrow.textContent = '▲';
+      }
+    }
   </script>
 </body>
 </html>
-
