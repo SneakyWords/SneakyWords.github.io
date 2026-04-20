@@ -312,24 +312,24 @@
     <div class="button-row">
       <select id="topic-select" class="topic-dropdown">
         <option value="" disabled selected><span id="instructions-arrow">▼</span> Select a Topic</option>
-        <option value="animals">Numbers 0 - 10</option>
-        <option value="preset-tens-btn">Numbers (tens)</option>
-        <option value="preset-othernum-btn">Numbers (other)</option>
-        <option value="preset-shapes-btn">Shapes</option>
+        <option value="preset-animals-btn">Animals</option>
+        <option value="preset-faces-btn">Faces</option>
+        <option value="preset-food-btn">Food</option>
+        <option value="preset-school-btn">School</option>
         <option value="preset-colors-btn">Colors</option>
-        <option value="preset-days-btn">Days of the week</option>
+        <!--<option value="preset-days-btn">Days of the week</option>
         <option value="preset-months-btn">Months</option>
-        <option value="preset-class-btn">Class Friends</option>
+        <option value="preset-class-btn">Class Friends</option>-->
       </select>
       <div class="desktop-buttons">
-        <button id="animals" class="preset-btn">Numbers 0 - 10</button>
-        <button id="preset-tens-btn" class="preset-btn">Numbers (tens)</button>
-        <button id="preset-othernum-btn" class="preset-btn">Numbers (other)</button>
-        <button id="preset-shapes-btn" class="preset-btn">Shapes</button>
+        <button id="preset-animals-btn" class="preset-btn">Animals</button>
+        <button id="preset-faces-btn" class="preset-btn">Faces</button>
+        <button id="preset-food-btn" class="preset-btn">Food</button>
+        <button id="preset-school-btn" class="preset-btn">School</button>
         <button id="preset-colors-btn" class="preset-btn">Colors</button>
-        <button id="preset-days-btn" class="preset-btn">Days of the week</button>
+        <!--<button id="preset-days-btn" class="preset-btn">Days of the week</button>
         <button id="preset-months-btn" class="preset-btn">Months</button>
-        <button id="preset-class-btn" class="preset-btn">Class Friends</button>
+        <button id="preset-class-btn" class="preset-btn">Class Friends</button>-->
       </div>
     </div>
     <div id="word-inputs-container" class="word-inputs-container invis">
@@ -1243,14 +1243,14 @@
 
       // Preset buttons functionality
       const presets = {
-        'animals': ["tiger", "monkey", "zebra", "snake", "crocodile", "lion", "hiss", "roar",],
-        'preset-tens-btn': ["ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"],
-        'preset-othernum-btn': ["zero", "ten", "hundred", "thousand", "million", "billion", "plus", "minus", "times", "divided"],
-        'preset-shapes-btn': ["circle", "rectangle", "triangle", "square", "trapezoid", "cone", "cylinder", "cube", "prism"],
-        'preset-colors-btn': ["pink", "red", "orange", "yellow", "green", "blue", "purple", "brown", "black", "white"],
-        'preset-days-btn': ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-        'preset-months-btn': ["January", "February", "March", "April", "May", "June", "July", "September", "October", "November", "December"],
-        'preset-class-btn': ["Celeste", "Connor", "David", "Grace", "Grayson", "Jaden", "Jojo", "Luna", "Mateo", "Stellan", "Zayn", "Zoe", "MsCordier"],
+        'preset-animals-btn': ["tiger", "monkey", "zebra", "snake", "crocodile", "lion", "hiss", "roar"],
+        'preset-faces-btn': ["face", "hair", "eyes", "nose", "ears", "mouth", "hands", "teeth", "tail","feet","tummy"],
+        'preset-food-btn': ["fish", "cheese", "yoghurt", "bread", "rice", "pasta", "coffee", "tea", "lemonade", "water","milk","butter","cake","cereal","wheat","field","soup"],
+        'preset-school-btn': ["chair", "table", "pen", "teacher", "book", "clock", "school", "class", "friend"],
+        'preset-colors-btn': ["red", "yellow", "brown", "grey", "gold", "blue", "white", "orange", "purple", "silver","green","black","pink"],
+        //'preset-days-btn': ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        //'preset-months-btn': ["January", "February", "March", "April", "May", "June", "July", "September", "October", "November", "December"],
+        //'preset-class-btn': ["Celeste", "Connor", "David", "Grace", "Grayson", "Jaden", "Jojo", "Luna", "Mateo", "Stellan", "Zayn", "Zoe", "MsCordier"],
         //'preset-9-btn': ["soccer", "tennis", "golf", "rugby", "swim", "run", "jump", "ski", "surf", "bike"],
         //'preset-10-btn': ["rain", "snow", "wind", "storm", "sun", "cloud", "fog", "ice", "heat", "cold"]
       };
